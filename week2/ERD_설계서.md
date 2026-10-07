@@ -96,33 +96,30 @@ order_items는 부모(주문, 상품) 없이는 존재할 수 없으므로 식�
 
 ## 6. DDL
 
-설계를 실제 표로 옮긴 SQL입니다. 기존 `shop` DB의 `products`와 충돌하지 않도록 별도 DB에서 실행합니다.
+MySQL 8.0 컨테이너(`de-mysql`)의 `shop` DB에 실제로 만든 표의 정의입니다. `SHOW CREATE TABLE`로 확인한 내용에서 엔진·문자셋 같은 부가 옵션을 뺀 것입니다.
 생성 순서는 **부모 표 → 자식 표**여야 합니다. (FK가 참조할 표가 먼저 존재해야 하기 때문입니다.)
 
-**Workbench 모델(`ERD.mwb`)과 다른 점.** 모델의 스키마 이름은 `mydb`이고, FK 이름은 Workbench가 자동으로 붙인 `fk_orders_customers1` 같은 이름이며, `id`에는 AUTO_INCREMENT가 없습니다.
-아래 DDL은 이 모델을 바탕으로 다음 세 가지를 다듬은 것입니다.
+**Workbench 모델(`ERD.mwb`)과 다른 점.** 모델은 ERD를 그리는 단계의 설계이고, 실제 DB는 아래 네 가지를 더 다듬어서 만들었습니다.
 
-| 다듬은 점 | 이유 |
-|---|---|
-| 스키마 이름을 `shop_erd`로 지정 | 기존 `shop` DB의 표와 충돌하는 것을 방지 |
-| FK 이름을 의미 있게 지정 (`fk_orders_customer` 등) | 오류 메시지와 `information_schema`에서 알아보기 쉬움 |
-| `id`에 AUTO_INCREMENT, 필수 컬럼에 NOT NULL 추가 | 번호를 DB가 자동으로 부여하고, 빈 값이 들어오는 것을 방지 |
+| 항목 | ERD.mwb 모델 | 실제 DB (아래 DDL) |
+|---|---|---|
+| 스키마 이름 | `mydb` (Workbench 기본값) | `shop` |
+| `id` 컬럼 | AUTO_INCREMENT 없음 | AUTO_INCREMENT (번호를 DB가 자동 부여) |
+| NOT NULL | PK·FK 컬럼에만 지정 | 모든 컬럼에 지정 (빈 값 방지) |
+| FK 이름 | Workbench 자동 이름 (`fk_orders_customers1` 등) | 직접 지정 (`fk_orders_customer` 등) |
 
 ```sql
-CREATE DATABASE IF NOT EXISTS shop_erd DEFAULT CHARACTER SET utf8mb4;
-USE shop_erd;
-
 -- 1) 부모 표
 CREATE TABLE customers (
   id   INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(50) NOT NULL,
-  tel  VARCHAR(20)
+  tel  VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE products (
   id       INT AUTO_INCREMENT PRIMARY KEY,
   name     VARCHAR(100) NOT NULL,
-  category VARCHAR(50),
+  category VARCHAR(50) NOT NULL,
   price    INT NOT NULL,
   stock    INT NOT NULL DEFAULT 0
 );
@@ -160,12 +157,12 @@ CREATE TABLE order_items (
 -- FK 3개가 의도대로 걸렸는지
 SELECT table_name, constraint_name, referenced_table_name
 FROM information_schema.key_column_usage
-WHERE table_schema = 'shop_erd' AND referenced_table_name IS NOT NULL;
+WHERE table_schema = 'shop' AND referenced_table_name IS NOT NULL;
 
 -- order_items의 복합 PK 순서 (order_id → product_id)
 SELECT index_name, seq_in_index, column_name
 FROM information_schema.statistics
-WHERE table_schema = 'shop_erd' AND table_name = 'order_items'
+WHERE table_schema = 'shop' AND table_name = 'order_items'
   AND index_name = 'PRIMARY'
 ORDER BY seq_in_index;
 ```
@@ -175,4 +172,4 @@ ORDER BY seq_in_index;
 ## 7. 설계하면서 배운 점
 
 - 관계선을 그으면 Workbench가 FK 컬럼을 `테이블명_컬럼명` 형태로 자동 생성합니다. 미리 만들어 둔 컬럼과 겹치면 중복되므로, FK 컬럼은 관계선에 맡기고 이름만 다듬는 것이 안전합니다.
-- 기존 표가 있는 `shop` 스키마에 그대로 반영하면 충돌할 수 있으므로 별도 스키마를 사용합니다.
+- ERD 모델과 실제 DB는 NOT NULL, AUTO_INCREMENT, FK 이름 같은 세부 설정이 다를 수 있습니다. 모델에서 DDL을 뽑을 때(Forward Engineer)는 이 부분을 확인하고 다듬어야 합니다.
