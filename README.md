@@ -9,7 +9,8 @@
 | 3주차 | 주문 데이터 정제 파이프라인 + 품질 리포트 | [week3](week3) |
 | 4주차 | MinIO · Iceberg · Trino 레이크하우스 | [week4](week4) |
 | 5주차 | Spark 배치 데이터 마트 + 파티션·셔플 측정 | [week5](week5) |
+| 6주차 | Kafka · Debezium CDC · Kafka Connect → MinIO 적재 | [week6](week6) |
 
 ## 주의
 
-각 폴더의 `minioadmin`, `admin/password123` 같은 접속 정보는 수업용 로컬 환경의 값이며 실제 서비스 계정이 아닙니다.
+각 폴더의 `minioadmin`, `admin/password123`, `rootpw` 같은 접속 정보는 수업용 로컬 환경의 값이며 실제 서비스 계정이 아닙니다.
