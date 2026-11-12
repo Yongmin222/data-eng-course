@@ -1,0 +1,20 @@
+# vector-schema.yaml — 벡터 스키마 정의서 (주차 산출물 ①)
+collection: lecture_kb
+embedding:
+  model: embeddinggemma          # OpenAI 경로면 text-embedding-3-small
+  dim: 768                       # 모델 차원과 반드시 일치 (text-embedding-3-small 은 1536)
+vector:
+  size: 768                      # embedding.dim 과 같은 값
+  distance: Cosine
+payload:
+  - name: text
+    type: string        # chunk 본문
+  - name: source
+    type: string        # 원본 역참조 주소 (예: minio://raw-docs/notes/notes.txt)
+  - name: chunk_index
+    type: integer       # 문서 안에서의 chunk 순번
+chunking:
+  splitter: RecursiveCharacterTextSplitter
+  chunk_size: 300
+  chunk_overlap: 30
+id_rule: uuid5(source + "#" + chunk_index)   # 재실행 안전(멱등) 규칙
