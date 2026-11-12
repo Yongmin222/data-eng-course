@@ -10,6 +10,7 @@
 | 4주차 | MinIO · Iceberg · Trino 레이크하우스 | [week4](week4) |
 | 5주차 | Spark 배치 데이터 마트 + 파티션·셔플 측정 | [week5](week5) |
 | 6주차 | Kafka · Debezium CDC · Kafka Connect → MinIO 적재 | [week6](week6) |
+| 7주차 | RAG · 청킹 · 임베딩 · Qdrant · 하이브리드 검색 | [week7](week7) |
 
 ## 주의
 
