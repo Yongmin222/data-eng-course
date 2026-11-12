@@ -12,6 +12,12 @@ MinIO에 둔 문서를 잘라 임베딩해 Qdrant에 색인하고, 키워드(BM2
 
 ## 2. 데이터 흐름
 
+```
+MinIO(raw-docs) → 청킹(300/30) → 임베딩 → Qdrant(lecture_kb)
+
+질문 → BM25 검색 + 벡터 검색 → RRF 합산 → 상위 조각 → LLM 답변 + 근거(source)
+```
+
 ## 3. 벡터 스키마 (`vector-schema.yaml`)
 
 | 항목 | 값 |
